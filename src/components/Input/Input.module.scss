@@ -1,0 +1,12 @@
+.Input {
+  background-color: var(--textBox);
+  border: 0;
+  border-radius: 0;
+  padding: 1.5rem 1rem;
+
+  &:focus {
+    color: var(--textBoxText);
+    background-color: var(--textBox);
+    box-shadow: none !important;
+  }
+}

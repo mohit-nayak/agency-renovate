@@ -1,0 +1,11 @@
+.App {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+
+  .PageContentWrapper {
+    padding: 1rem;
+    flex: 1;
+    overflow-y: auto;
+  }
+}

@@ -1,0 +1,13 @@
+:root {
+  --primary: #857650;
+  --background: #0b0b0b;
+  --text: #a0a0a0;
+  --textBox: #1c1c1c;
+  --textBoxText: #a0a0a0;
+  --ProjectText: #ededed;
+}
+
+$primary: #857650;
+$input-plaintext-color: #a0a0a0;
+
+@import '~bootstrap';
