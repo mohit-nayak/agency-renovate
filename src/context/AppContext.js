@@ -1,18 +1,37 @@
 import createDataContext from "./createDataContext";
-import { START_LOADING, STOP_LOADING, SHOW_SIDEBAR, HIDE_SIDEBAR } from './actionTypes';
+import {
+    START_APP_LOADING,
+    STOP_APP_LOADING,
+    START_AUTH_LOADING,
+    STOP_AUTH_LOADING,
+    SHOW_SIDEBAR,
+    HIDE_SIDEBAR
+} from './actionTypes';
 
 const appReducer = (state, action) => {
     switch (action.type) {
-        case START_LOADING:
+        case START_APP_LOADING:
             return {
                 ...state,
                 loading: true,
             };
 
-        case STOP_LOADING:
+        case STOP_APP_LOADING:
             return {
                 ...state,
                 loading: false,
+            };
+
+        case START_AUTH_LOADING:
+            return {
+                ...state,
+                authLoading: true,
+            };
+
+        case STOP_AUTH_LOADING:
+            return {
+                ...state,
+                authLoading: false,
             };
 
         case SHOW_SIDEBAR:
@@ -34,13 +53,25 @@ const appReducer = (state, action) => {
 
 const startLoading = dispatch => {
     return () => {
-        dispatch({ type: START_LOADING });
+        dispatch({ type: START_APP_LOADING });
     };
 };
 
 const stopLoading = dispatch => {
     return () => {
-        dispatch({ type: STOP_LOADING });
+        dispatch({ type: STOP_APP_LOADING });
+    };
+};
+
+const startAuthLoading = dispatch => {
+    return () => {
+        dispatch({ type: START_AUTH_LOADING });
+    };
+};
+
+const stopAuthLoading = dispatch => {
+    return () => {
+        dispatch({ type: STOP_AUTH_LOADING });
     };
 };
 
@@ -58,6 +89,13 @@ const hideSidebar = dispatch => {
 
 export const { Context, Provider } = createDataContext(
     appReducer,
-    { startLoading, stopLoading, showSidebar, hideSidebar },
-    { loading: false, sidebarActive: true }
+    {
+        startLoading,
+        stopLoading,
+        startAuthLoading,
+        stopAuthLoading,
+        showSidebar,
+        hideSidebar
+    },
+    { loading: false, authLoading: false, sidebarActive: false }
 );

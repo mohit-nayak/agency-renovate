@@ -9,14 +9,14 @@ import styles from './AuthForm.module.scss';
 const AuthForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { startLoading, stopLoading } = useContext(appContext);
+    const { startAuthLoading, stopAuthLoading } = useContext(appContext);
     const { state: { errorMessage }, signIn } = useContext(authContext);
 
     const submitHandler = (e) => {
         e.preventDefault();
 
-        startLoading();
-        signIn(email, password, stopLoading);
+        startAuthLoading();
+        signIn(email, password, stopAuthLoading);
     };
 
     return (

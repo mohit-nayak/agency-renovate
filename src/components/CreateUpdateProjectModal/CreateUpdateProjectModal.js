@@ -1,38 +1,34 @@
 import React, {useState, useEffect} from 'react';
 import Form from 'react-bootstrap/Form';
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import ImageUploader from "../ImageUploader/ImageUploader";
 import AppModal from "../AppModal/AppModal";
 import Input from "../Input/Input";
 import AppButton from "../AppButton/AppButton";
 import styles from './CreateUpdateProjectModal.module.scss';
+import {storage} from "../../config/firebase";
 
-const CreateUpdateProjectModal = ({ show, onHide, randomizeFileName, onSubmit }) => {
+const CreateUpdateProjectModal = ({ show, onHide, data, onImageChanged, onSubmit }) => {
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
     const [previewFileName, setPreviewFileName] = useState("");
     const [previewDownloadUrl, setPreviewDownloadUrl] = useState("");
-    const [lowestBudget, setLowestBudget] = useState("");
-    const [highestBudget, setHighestBudget] = useState("");
+    const [budget, setBudget] = useState("");
     const [completionTime, setCompletionTime] = useState("");
     const [validated, setValidated] = useState(null);
-
-    let highestBudgetDefault = "";
-    if (lowestBudget) {
-        highestBudgetDefault = parseInt(lowestBudget) + 1;
-    }
 
     const onUploadSuccess = (filename, downloadUrl) => {
         setPreviewFileName(filename);
         setPreviewDownloadUrl(downloadUrl);
+        onImageChanged(filename, downloadUrl);
     };
 
+    // On reset the uploaded image.
     const onUploadReset = () => {
         setPreviewFileName("");
         setPreviewDownloadUrl("");
     };
 
+    // Validate data and send to submission function.
     const submitHandler = e => {
         e.preventDefault();
 
@@ -41,10 +37,8 @@ const CreateUpdateProjectModal = ({ show, onHide, randomizeFileName, onSubmit })
             previewDownloadUrl.trim() &&
             title.trim() &&
             desc.trim() &&
-            parseInt(lowestBudget.trim()) > 0 &&
-            parseInt(highestBudget.trim()) &&
-            completionTime.trim() &&
-            parseInt(highestBudget.trim()) > parseInt(lowestBudget.trim())
+            budget.trim() &&
+            completionTime.trim()
         );
 
          const data = {
@@ -52,7 +46,7 @@ const CreateUpdateProjectModal = ({ show, onHide, randomizeFileName, onSubmit })
              previewDownloadUrl,
              title,
              desc,
-             budget: `$${lowestBudget} - $${highestBudget}`,
+             budget,
              completionTime,
          };
 
@@ -60,37 +54,66 @@ const CreateUpdateProjectModal = ({ show, onHide, randomizeFileName, onSubmit })
              onSubmit(data);
              resetForm();
          }
+         setValidated(validation);
     };
 
+    // Reset form values.
     const resetForm = () => {
         setPreviewFileName("");
         setPreviewDownloadUrl("");
         setTitle("");
         setDesc("");
-        setLowestBudget("");
-        setHighestBudget("");
+        setBudget("");
         setCompletionTime("");
         setValidated(null);
     };
 
+    const deletePreview = async filename => {
+        await storage().ref("project-previews").child(filename).delete();
+    };
+
+    const discardUploadedImage = () => {
+        deletePreview(previewFileName).then(res => res);
+    };
+
+    // Hide modal. Check and delete uploaded image if new project creation attempted and discarded.
     const hideModalHandler = () => {
+        if (!data && previewFileName && previewDownloadUrl) {
+            discardUploadedImage();
+        }
+
         resetForm();
         onHide();
     };
 
     useEffect(() => {
+        // Reset the validation on change in any field.
         setValidated(null);
-    }, [previewFileName, previewDownloadUrl, title, desc, lowestBudget, highestBudget, completionTime]);
+    }, [previewFileName, previewDownloadUrl, title, desc, budget, completionTime]);
+
+    useEffect(() => {
+        // If attempt to edit existing project, populate the data in the form.
+        if (data) {
+            setPreviewFileName(data.previewFileName);
+            setPreviewDownloadUrl(data.previewDownloadUrl);
+            setTitle(data.title);
+            setDesc(data.desc);
+            setBudget(data.budget);
+            setCompletionTime(data.completionTime);
+        }
+    }, [data]);
 
     return (
         <AppModal show={show} onHide={hideModalHandler}>
             <Form className="py-2">
-                <ImageUploader name="preview"
-                               required={true}
+                <ImageUploader required={true}
+                               existingFileName={previewFileName}
+                               existingFileUrl={previewDownloadUrl}
                                onUploadSuccess={onUploadSuccess}
                                onUploadReset={onUploadReset}
+                               deleteFile={deletePreview}
                                storageRef="project-previews"
-                               randomizeFileName={randomizeFileName}
+                               randomizeFileName={true}
                 />
 
                 <Form.Group>
@@ -104,15 +127,8 @@ const CreateUpdateProjectModal = ({ show, onHide, randomizeFileName, onSubmit })
                 </Form.Group>
 
                 <Form.Group>
-                    <Form.Label>Budget ($)</Form.Label>
-                    <Row>
-                        <Col>
-                            <Input type="number" value={lowestBudget} onChange={setLowestBudget} min={0} placeholder="From" required={true} />
-                        </Col>
-                        <Col>
-                            <Input type="number" value={highestBudget} onChange={setHighestBudget} min={highestBudgetDefault} placeholder="To" required={true} />
-                        </Col>
-                    </Row>
+                    <Form.Label>Budget</Form.Label>
+                    <Input type="text" value={budget} onChange={setBudget} placeholder="From E.g. $10K to $20K" required={true} />
                 </Form.Group>
 
                 <Form.Group>
@@ -122,7 +138,13 @@ const CreateUpdateProjectModal = ({ show, onHide, randomizeFileName, onSubmit })
 
                 <Form.Group className="mt-3 mb-0">
                     { (!validated && validated !== null) && <label className="text-danger">One or more fields are not filled correctly.</label> }
-                    <AppButton type="submit" classes={[styles.SubmitBtn]} onClick={submitHandler}>Add Project</AppButton>
+
+                    <AppButton type="submit"
+                               classes={[styles.SubmitBtn]}
+                               onClick={submitHandler}
+                               disabled={!previewDownloadUrl}>
+                        Add Project
+                    </AppButton>
                 </Form.Group>
             </Form>
         </AppModal>

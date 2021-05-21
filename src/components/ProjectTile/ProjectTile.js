@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import styles from './ProjectTile.module.scss';
+import AppButton from "../AppButton/AppButton";
 
-const ProjectTile = ({ project }) => {
+const ProjectTile = ({ id, project, onEdit, onDelete }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
-    const [imageAvailble, setImageAvailable] = useState(true);
-    const allowedDescLength = 120;
+    const [imageAvailable, setImageAvailable] = useState(true);
+    const allowedDescLength = 100;
     const desc = project.desc.length > allowedDescLength ? `${project.desc.substring(0, allowedDescLength)}...` : project.desc;
 
     return (
@@ -23,12 +26,13 @@ const ProjectTile = ({ project }) => {
                                  alt="Preview" />
                         ) }
 
-                        { !imageAvailble && <p className={styles.NotAvailableText}>No Preview available</p> }
+                        { !imageAvailable && <p className={styles.NotAvailableText}>No Preview available</p> }
 
-                        { (imageAvailble && !imageLoaded) && <Spinner animation="grow" className={styles.Spinner} /> }
+                        { (imageAvailable && !imageLoaded) && <div className={styles.Spinner}><Spinner animation="grow" /></div> }
                     </div>
                 </Col>
-                <Col md={8}>
+
+                <Col md={7}>
                     <div className={styles.ContentContainer}>
                         <div>
                             <h5 className={styles.Title}>{ project.title }</h5>
@@ -45,6 +49,17 @@ const ProjectTile = ({ project }) => {
                                 <p className={styles.Value}>{ project.completionTime }</p>
                             </Col>
                         </Row>
+                    </div>
+                </Col>
+
+                <Col md={1}>
+                    <div className={styles.ActionContainer}>
+                        <AppButton variant="link" onClick={() => onEdit(id, project)} classes={[styles.ActionBtn]}>
+                            <FontAwesomeIcon icon={faPencilAlt} /> <span>Edit</span>
+                        </AppButton>
+                        <AppButton variant="link" onClick={() => onDelete(id)} classes={[styles.ActionBtn]}>
+                            <FontAwesomeIcon icon={faTrash} /> <span>Delete</span>
+                        </AppButton>
                     </div>
                 </Col>
             </Row>

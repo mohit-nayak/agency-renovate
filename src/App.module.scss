@@ -3,9 +3,17 @@
   overflow: hidden;
   display: flex;
 
+  @media (max-width: 991px) {
+    //overflow: auto;
+  }
+
   .PageContentWrapper {
     padding: 1rem;
     flex: 1;
     overflow-y: auto;
+
+    @media (max-width: 991px) {
+      padding-top: var(--mobileTopBarHeight);
+    }
   }
 }

@@ -7,24 +7,27 @@ import AppRoutes from "./Routes/AppRoutes";
 import Loading from "./components/Loading/Loading";
 import styles from './App.module.scss';
 import Sidebar from "./components/Sidebar/Sidebar";
+import MobileTopBar from "./components/MobileTopBar/MobileTopBar";
 
 function App() {
-    const { startLoading } = useContext(appContext);
+    const { startAuthLoading, stopAuthLoading } = useContext(appContext);
     const { state: { authenticated }, checkAuth } = useContext(authContext);
 
     useEffect(() => {
-        startLoading();
-        checkAuth();
+        startAuthLoading();
+        checkAuth(stopAuthLoading);
 
         // eslint-disable-next-line
     }, []);
 
     return (
         <div className={styles.App}>
-            <Loading />
+            <Loading type="app" />
+            <Loading type="auth" />
 
             <Router>
                 { authenticated && <>
+                    <MobileTopBar />
                     <Sidebar />
                     <div className={styles.PageContentWrapper}>
                         <AppRoutes />

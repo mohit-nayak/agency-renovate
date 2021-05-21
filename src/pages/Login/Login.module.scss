@@ -5,6 +5,10 @@
   align-items: center;
   justify-content: center;
 
+  @media (max-width: 767px) {
+    margin-top: -5rem;
+  }
+
   .HeadingContainer {
     text-align: center;
     margin-bottom: 2rem;

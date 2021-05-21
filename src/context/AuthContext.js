@@ -71,8 +71,16 @@ const signIn = dispatch => {
     }
 };
 
-const signOut = () => {
-
+const signOut = dispatch => {
+    return async () => {
+        try {
+            await auth().signOut();
+            dispatch({ type: SIGN_OUT });
+        }
+        catch (err) {
+            dispatch({ type: SET_ERROR, payload: getErrorMessage(err.code) });
+        }
+    };
 };
 
 export const { Context, Provider } = createDataContext(

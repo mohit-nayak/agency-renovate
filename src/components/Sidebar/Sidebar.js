@@ -6,10 +6,12 @@ import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faList, faCog, faQuestionCircle, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { Context as appContext } from '../../context/AppContext';
+import { Context as authContext } from '../../context/AuthContext';
 import styles from './Sidebar.module.scss';
 
 const Sidebar = () => {
     const { state: { sidebarActive }, hideSidebar } = useContext(appContext);
+    const { signOut } = useContext(authContext);
 
     return (
         <>
@@ -25,24 +27,24 @@ const Sidebar = () => {
                      activeKey="/home"
                      onSelect={selectedKey => alert(`selected ${selectedKey}`)}>
                     <Nav.Item>
-                        <NavLink to="/" className={styles.NavLink}>
+                        <NavLink to="/" className={styles.NavLink} onClick={hideSidebar}>
                             <FontAwesomeIcon icon={faList} className={styles.Icon} /> Projects
                         </NavLink>
                     </Nav.Item>
                     <Nav.Item>
-                        <NavLink to="/quotes" className={styles.NavLink}>
+                        <NavLink to="/quotes" className={styles.NavLink} onClick={hideSidebar}>
                             <FontAwesomeIcon icon={faQuestionCircle} className={styles.Icon} /> Queries
                         </NavLink>
                     </Nav.Item>
                     <Nav.Item>
-                        <NavLink to="/settings" className={styles.NavLink}>
+                        <NavLink to="/settings" className={styles.NavLink}  onClick={hideSidebar}>
                             <FontAwesomeIcon icon={faCog} className={styles.Icon} /> Settings
                         </NavLink>
                     </Nav.Item>
                 </Nav>
 
                 <div className={styles.Footer}>
-                    <AppButton variant="link" classes={[styles.LogoutBtn]}>
+                    <AppButton variant="link" classes={[styles.LogoutBtn]} onClick={signOut}>
                         Sign out
                         <FontAwesomeIcon icon={faSignOutAlt} className={styles.Icon} />
                     </AppButton>

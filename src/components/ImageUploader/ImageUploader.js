@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 import AppButton from "../AppButton/AppButton";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,11 +9,13 @@ import styles from './ImageUploader.module.scss';
 
 const ImageUploader = (
     {
-        name = 'preview',
+        existingFileUrl = "",
+        existingFileName = "",
         required = false,
         randomizeFileName = true,
         onUploadSuccess = () => {},
         onUploadReset = () => {},
+        deleteFile = () => {},
         storageRef = ''
     }
 ) => {
@@ -25,7 +27,11 @@ const ImageUploader = (
     const showUploader = !uploading && !imageUrl;
     const showLoading = uploading || ( imageUrl && !imageLoaded );
 
-    const uploadSuccessHandler = filename => {
+    const uploadSuccessHandler = async filename => {
+        if (existingFileUrl) {
+            await deleteFile(existingFileName);
+        }
+
         storage()
             .ref(storageRef)
             .child(filename)
@@ -50,8 +56,14 @@ const ImageUploader = (
         setUploadProgress(0);
         setImageUrl(null);
         setImageLoaded(false);
-        onUploadReset();
+        if (!existingFileName && !existingFileUrl) {
+            onUploadReset();
+        }
     };
+
+    useEffect(() => {
+        setImageUrl(existingFileUrl);
+    }, [existingFileUrl]);
 
     return (
         <div className={styles.Wrapper}>
