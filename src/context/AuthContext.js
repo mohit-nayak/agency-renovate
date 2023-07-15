@@ -1,6 +1,17 @@
 import createDataContext from './createDataContext';
-import { SIGN_IN, SIGN_OUT, SET_ERROR, RESET_ERROR } from './actionTypes';
-import { auth } from '../config/firebase';
+import {
+    SIGN_IN,
+    SIGN_OUT,
+    SET_SUPER_ADMIN,
+    SET_ERROR,
+    RESET_ERROR ,
+    SET_CREATE_USER_ERROR,
+    RESET_CREATE_USER_ERROR,
+    CREATE_USER_SUCCESS,
+    CREATE_USER_SUCCESS_RESET,
+} from './actionTypes';
+import { auth, secondaryApp } from '../config/firebase';
+import { getDataAt } from "../api/firebase";
 import { getErrorMessage } from '../utility/functions';
 
 const authReducer = (state, action) => {
@@ -20,17 +31,47 @@ const authReducer = (state, action) => {
                 user: null,
             };
 
+        case SET_SUPER_ADMIN:
+            return {
+                ...state,
+                isSuperAdmin: action.payload,
+            };
+
         case SET_ERROR:
             return {
                 ...state,
                 errorMessage: action.payload,
-            }
+            };
 
         case RESET_ERROR:
             return {
                 ...state,
                 errorMessage: '',
-            }
+            };
+
+        case SET_CREATE_USER_ERROR:
+            return {
+                ...state,
+                createUserErrorMessage: action.payload,
+            };
+
+        case RESET_CREATE_USER_ERROR:
+            return {
+                ...state,
+                createUserErrorMessage: '',
+            };
+
+        case CREATE_USER_SUCCESS:
+            return {
+                ...state,
+                createUserSuccess: true,
+            };
+
+        case CREATE_USER_SUCCESS_RESET:
+            return {
+                ...state,
+                createUserSuccess: false,
+            };
 
         default:
             return state;
@@ -41,7 +82,12 @@ const checkAuth = dispatch => {
     return (callback) => {
         auth().onAuthStateChanged(function(user) {
             if (user) {
-                dispatch({ type: SIGN_IN, payload: user });
+                // Check if the user is super admin.
+                getDataAt('superAdmin')
+                    .then(res => {
+                        dispatch({ type: SET_SUPER_ADMIN, payload: !!(res && user.email === res) });
+                        dispatch({ type: SIGN_IN, payload: user });
+                    });
             } else {
                 dispatch({ type: SIGN_OUT });
             }
@@ -57,7 +103,6 @@ const signIn = dispatch => {
     return async (email, password, callback) => {
         try {
             const response = await auth().signInWithEmailAndPassword(email, password);
-            console.log("signed in", response.user)
             dispatch({ type: SIGN_IN, payload: response.user });
             dispatch({ type: RESET_ERROR });
         }
@@ -83,8 +128,42 @@ const signOut = dispatch => {
     };
 };
 
+const createUser = dispatch => {
+    return async (email, password, isSuperAdmin, callback) => {
+        dispatch({ type: CREATE_USER_SUCCESS_RESET });
+
+        if (isSuperAdmin) {
+            try {
+                await secondaryApp.auth().createUserWithEmailAndPassword(email, password)
+                    .then(user => {
+                        secondaryApp.auth().signOut();
+                        dispatch({ type: CREATE_USER_SUCCESS });
+                        dispatch({ type: RESET_CREATE_USER_ERROR });
+                    });
+            }
+            catch (err) {
+                dispatch({ type: SET_CREATE_USER_ERROR, payload: err.message });
+            }
+        }
+        else {
+            dispatch({ type: SET_CREATE_USER_ERROR, payload: "Only super admins are allowed to create new admin." });
+        }
+
+        if (callback) {
+            callback();
+        }
+    };
+};
+
 export const { Context, Provider } = createDataContext(
     authReducer,
-    { checkAuth, signIn, signOut },
-    { authenticated: null, user: null, errorMessage: '' },
+    { checkAuth, signIn, signOut, createUser },
+    {
+        authenticated: null,
+        user: null,
+        isSuperAdmin: false,
+        errorMessage: '',
+        createUserErrorMessage: '' ,
+        createUserSuccess: false,
+    },
 );
