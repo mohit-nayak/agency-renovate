@@ -4,11 +4,11 @@
   display: flex;
 
   @media (max-width: 991px) {
-    //overflow: auto;
+    overflow: auto;
   }
 
   .PageContentWrapper {
-    padding: 1rem;
+    padding: 2rem 1rem 1rem;
     flex: 1;
     overflow-y: auto;
 

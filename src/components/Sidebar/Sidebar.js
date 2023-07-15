@@ -11,16 +11,16 @@ import styles from './Sidebar.module.scss';
 
 const Sidebar = () => {
     const { state: { sidebarActive }, hideSidebar } = useContext(appContext);
-    const { signOut } = useContext(authContext);
+    const { state: { isSuperAdmin }, signOut } = useContext(authContext);
 
     return (
         <>
             <div className={[styles.SidebarWrapper, sidebarActive ? styles.Active : ''].join(' ')}>
                 <div className={styles.Header}>
-                    <NavLink to="/">
+                    <NavLink to="/" onClick={hideSidebar}>
                         <img src={Logo} className={styles.Logo} alt="Logo" />
                     </NavLink>
-                    <p className={styles.Title}>Hi Admin!</p>
+                    {/*<p className={styles.Title}>Hi Admin!</p>*/}
                 </div>
 
                 <Nav className={styles.Sidebar}
@@ -33,14 +33,14 @@ const Sidebar = () => {
                     </Nav.Item>
                     <Nav.Item>
                         <NavLink to="/quotes" className={styles.NavLink} onClick={hideSidebar}>
-                            <FontAwesomeIcon icon={faQuestionCircle} className={styles.Icon} /> Queries
+                            <FontAwesomeIcon icon={faQuestionCircle} className={styles.Icon} /> Quotes
                         </NavLink>
                     </Nav.Item>
-                    <Nav.Item>
+                    { isSuperAdmin && <Nav.Item>
                         <NavLink to="/settings" className={styles.NavLink}  onClick={hideSidebar}>
                             <FontAwesomeIcon icon={faCog} className={styles.Icon} /> Settings
                         </NavLink>
-                    </Nav.Item>
+                    </Nav.Item>}
                 </Nav>
 
                 <div className={styles.Footer}>

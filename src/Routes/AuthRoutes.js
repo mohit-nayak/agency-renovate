@@ -5,7 +5,7 @@ import Login from '../pages/Login/Login';
 const AuthRoutes = () => {
     return (
         <Switch>
-            <Route path='/' component={Login} exact />
+            <Route component={Login} />
         </Switch>
     );
 };

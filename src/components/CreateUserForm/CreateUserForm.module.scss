@@ -1,0 +1,23 @@
+.Wrapper {
+  width: 100%;
+  max-width: 350px;
+  padding: 2rem 0;
+  background-color: transparent;
+
+  .ErrorMsg {
+    color: var(--danger);
+    font-size: 0.9rem;
+  }
+
+  .SuccessMsg {
+    color: var(--primary);
+    font-size: 0.9rem;
+  }
+
+  .SubmitBtn {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+    font-weight: bold;
+  }
+}

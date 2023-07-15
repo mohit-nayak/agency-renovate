@@ -4,14 +4,13 @@ import 'firebase/database';
 import 'firebase/storage';
 
 const config = {
-    apiKey: "AIzaSyAvy4eAb-SJ6sP8wiFc-ItxAn5-LYRDlVg",
-    authDomain: "agencyrenovate.firebaseapp.com",
-    databaseURL: "https://agencyrenovate-default-rtdb.firebaseio.com",
-    projectId: "agencyrenovate",
-    storageBucket: "agencyrenovate.appspot.com",
-    messagingSenderId: "143010439922",
-    appId: "1:143010439922:web:e07f01c8194d07b0bce66b",
-    measurementId: "G-PSK4SHDDBL"
+    apiKey: "AIzaSyACECEi2IJkNolpk6y3WaOudbe8ioJ6oH0",
+    authDomain: "agency-renovate.firebaseapp.com",
+    databaseURL: "https://agency-renovate-default-rtdb.firebaseio.com",
+    projectId: "agency-renovate",
+    storageBucket: "agency-renovate.appspot.com",
+    messagingSenderId: "992416303439",
+    appId: "1:992416303439:web:41da49500c44d4eb5fdd3a"
 };
 
 if (!firebase.length) {
@@ -19,6 +18,11 @@ if (!firebase.length) {
     firebase.initializeApp(config);
 }
 
+const secondary = firebase.initializeApp(config, "Secondary");
+
 export const auth = firebase.auth;
 export const database = firebase.database;
 export const storage = firebase.storage;
+
+// New instance for user creation and keep them signed out.
+export const secondaryApp = secondary;

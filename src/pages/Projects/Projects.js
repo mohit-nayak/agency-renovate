@@ -18,12 +18,14 @@ const Projects = () => {
     const { startLoading, stopLoading } = useContext(appContext);
     const { state: { topProjects, recentProjects }, setProjects } = useContext(projectContext);
 
+    // Enable project edit mode.
     const editProjectHandler = (id, data) => {
         setActiveProjectID(id);
         setActiveProjectData({...data});
         setShowModal(true);
     };
 
+    // Update image for existing project.
     const onImageChanged = (filename, fileUrl) => {
         if (activeProjectData) {
             const updatedData = {
@@ -34,13 +36,16 @@ const Projects = () => {
 
             setActiveProjectData({ ...updatedData });
             api.updateProject(projectMode, activeProjectID, updatedData);
+
+            stopLoading();
         }
     };
 
+    // Create update project in database.
     const onSubmitHandler = (formData) => {
         startLoading();
         if (activeProjectID && activeProjectData) {
-            api.updateProject(projectMode, activeProjectID, formData);
+            api.updateProject(projectMode, activeProjectID, formData, stopLoading);
         }
         else {
             api.createProject(projectMode, formData);
@@ -49,22 +54,26 @@ const Projects = () => {
         hideModalHandler();
     };
 
+    // Delete file from Firebase storage.
     const onDeleteHandler = (id) => {
         startLoading();
         api.deleteProject(projectMode, id);
     };
 
+    // Hide modal and clear fields.
     const hideModalHandler = () => {
         setShowModal(false);
         setActiveProjectID(null);
         setActiveProjectData(null);
     };
 
+    // Store response each time data updated at backend.
     const storeResponse = data => {
         setProjects(data);
         stopLoading();
     };
 
+    // Start listening for data updates at backend.
     useEffect(() => {
         startLoading();
         api.startListeningForProjectDataChange(storeResponse);
@@ -81,7 +90,6 @@ const Projects = () => {
                         <FontAwesomeIcon icon={faLeaf} /> New
                     </AppButton>
                 </div>
-
             </div>
 
             <CreateUpdateProjectModal show={showModal}
@@ -96,7 +104,6 @@ const Projects = () => {
                           recentProjects={recentProjects}
                           onEdit={editProjectHandler}
                           onDelete={onDeleteHandler}
-
             />
         </div>
     );

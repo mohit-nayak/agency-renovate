@@ -1,0 +1,13 @@
+.Wrapper {
+
+  @media (min-width: 991px) {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .NotFound {
+    color: var(--textBoxText);
+    text-align: center;
+    margin-top: 20%;
+  }
+}

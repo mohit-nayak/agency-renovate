@@ -1,0 +1,32 @@
+.Wrapper {
+  margin-top: 1rem;
+
+  .Input {
+    color: var(--textBoxText);
+    padding: 1.25rem 1rem;
+    border-color: var(--background);
+    background-color: var(--background) !important;
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
+
+  .CancelLink {
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .SuccessMsg {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: var(--primary);
+  }
+
+  .ErrorMsg {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: var(--danger);
+  }
+}
